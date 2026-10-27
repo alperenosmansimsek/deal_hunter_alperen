@@ -4,7 +4,7 @@ from database import get_connection
 from bot_scanner import scan_and_notify
 
 # write your bot token here (from BotFather):
-BOT_TOKEN = "BURAYA_BOTFATHER_TOKENINI_YAPISTIR"
+BOT_TOKEN = "8855696578:AAGFnOBmCVVmOgh8Cu7fils9zMcT2fLDBV4"
 
 async def scheduled_deals_job():
     """searches for deals based on active alerts in the database and sends them to users via Telegram."""
