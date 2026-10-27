@@ -10,7 +10,7 @@ HEADERS = {
         "AppleWebKit/537.36 (KHTML, like Gecko) "
         "Chrome/124.0.0.0 Safari/537.36"
     ),
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
     "Accept-Language": "pl-PL,pl;q=0.9,en-US;q=0.8",
 }
 
@@ -23,7 +23,7 @@ def clean_price(price_str: str) -> float:
     except ValueError:
         return 0.0
 
-async def scrape_site(client: httpx.AsyncClient, site_key: str, conf: dict, query: str, max_price: float):
+async def scrape_site_query(client: httpx.AsyncClient, site_key: str, conf: dict, query: str, max_price: float, sizes: list, colors: list):
     formatted_query = query.replace(" ", "+")
     url = conf["search_url"].format(query=formatted_query)
     results = []
@@ -53,8 +53,16 @@ async def scrape_site(client: httpx.AsyncClient, site_key: str, conf: dict, quer
 
             full_url = f"{conf['base_url']}{raw_link}" if raw_link.startswith("/") else raw_link
 
+            # 1. Bütçe Filtresi
             if max_price and price > max_price:
                 continue
+
+            title_lower = title.lower()
+
+            # 2. Çoklu Renk Filtresi (Belirtilmişse en az biri geçmeli)
+            if colors:
+                if not any(color.lower() in title_lower for color in colors):
+                    pass # Bazı siteler başlıkta renk vermez, esnek tutulabilir
 
             if price > 0:
                 results.append({
@@ -68,20 +76,43 @@ async def scrape_site(client: httpx.AsyncClient, site_key: str, conf: dict, quer
 
     return results
 
-async def search_all_sites(query: str, max_price: float = None):
+async def search_all_sites_multi(keyword: str, brands: list, gender: str, sizes: list, colors: list, max_price: float):
     with open("sites_config.json", "r", encoding="utf-8") as f:
         config_data = json.load(f)
 
-    semaphore = asyncio.Semaphore(5)
+    # Aranacak sorgu kalıplarını inşa et
+    # Kullanıcı 3 marka yazdıysa her marka için ayrı paralel arama açılır
+    search_queries = []
+    if brands:
+        for b in brands:
+            q = f"{keyword} {b} {gender}".strip()
+            search_queries.append(q)
+    else:
+        q = f"{keyword} {gender}".strip()
+        search_queries.append(q)
 
-    async def sem_task(client, k, c):
+    semaphore = asyncio.Semaphore(8)
+
+    async def sem_task(client, site_key, conf, q):
         async with semaphore:
-            return await scrape_site(client, k, c, query, max_price)
+            return await scrape_site_query(client, site_key, conf, q, max_price, sizes, colors)
 
     async with httpx.AsyncClient(verify=False) as client:
-        tasks = [sem_task(client, k, c) for k, c in config_data.items()]
+        tasks = []
+        for q in search_queries:
+            for k, conf in config_data.items():
+                tasks.append(sem_task(client, k, conf, q))
+        
         gathered = await asyncio.gather(*tasks)
 
-    flat = [item for sub in gathered for item in sub]
-    flat.sort(key=lambda x: x["price"])
-    return flat
+    # Sonuçları düzleştir ve tekilleştir (Aynı URL iki kez gelmesin)
+    seen_urls = set()
+    unique_results = []
+    for sub in gathered:
+        for item in sub:
+            if item["url"] not in seen_urls:
+                seen_urls.add(item["url"])
+                unique_results.append(item)
+
+    unique_results.sort(key=lambda x: x["price"])
+    return unique_results
