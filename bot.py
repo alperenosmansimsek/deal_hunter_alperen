@@ -11,48 +11,80 @@ from telegram.ext import (
     filters,
 )
 from database import init_db, get_connection, create_alert
-from async_crawler import search_all_sites
+from async_crawler import search_all_sites_multi
 
-# BOTFATHER TOKENINI DOGRUDAN BURAYA YAZ:
 BOT_TOKEN = "8855696578:AAGFnOBmCVVmOgh8Cu7fils9zMcT2fLDBV4"
 
 logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
 
-KEYWORD, BRAND, SIZE, COLOR, PRICE = range(5)
+# Adımlar (Cinsiyet eklendi)
+KEYWORD, BRAND, GENDER, SIZE, COLOR, PRICE = range(6)
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = (
-        "🤖 *Polonya Fırsat Takip Botu Aktif*\n\n"
+        "🤖 *Polonya İndirim Avcısı Botu (Çoklu Filtre Sürümü)*\n\n"
         "Komutlar:\n"
-        "➕ `/yeni` - Yeni indirim alarmı kur\n"
-        "📋 `/alarmlarim` - Mevcut alarmlarını gör\n"
-        "❌ `/sil <id>` - Alarmı iptal et\n"
-        "🔍 `/tara` - Mevcut alarmları şimdi manuel tara"
+        "➕ `/yeni` - Yeni indirim alarmı oluştur\n"
+        "📋 `/alarmlarim` - Aktif alarmlarını gör\n"
+        "❌ `/sil <id>` - Bir alarmı kapat\n"
+        "🚫 `/iptal` - Girişi durdur"
     )
     await update.message.reply_text(msg, parse_mode="Markdown")
 
 async def new_alert(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    await update.message.reply_text("1️⃣ Aranacak ürün/kategori nedir? (Örn: kurtka, buty, plecak)")
+    await update.message.reply_text(
+        "1️⃣ *Hangi ürünü arıyorsun?*\n"
+        "Örnek: `kurtka`, `buty`, `plecak`",
+        parse_mode="Markdown"
+    )
     return KEYWORD
 
 async def get_keyword(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     context.user_data["keyword"] = update.message.text.strip()
-    await update.message.reply_text("2️⃣ Marka nedir? (Örn: Nike, The North Face veya 'hepsi')")
+    await update.message.reply_text(
+        "2️⃣ *Markalar neler? (İstediğin kadar yazabilirsin)*\n"
+        "Birden fazlaysa virgülle ayır veya `hepsi` yaz.\n"
+        "Örnek: `Nike, Adidas, Salomon, The North Face`",
+        parse_mode="Markdown"
+    )
     return BRAND
 
 async def get_brand(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     context.user_data["brand"] = update.message.text.strip()
-    await update.message.reply_text("3️⃣ Beden/Numara tercihin? (Örn: M, L, 43 veya 'hepsi')")
+    await update.message.reply_text(
+        "3️⃣ *Hedef cinsiyet/kategori nedir?*\n"
+        "Örnek: `meskie` (erkek), `damskie` (kadın), `dzieciece` (çocuk), `unisex` veya `hepsi`",
+        parse_mode="Markdown"
+    )
+    return GENDER
+
+async def get_gender(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    context.user_data["gender"] = update.message.text.strip()
+    await update.message.reply_text(
+        "4️⃣ *Beden / Numara tercihlerin neler?*\n"
+        "Birden fazlaysa virgülle ayır veya `hepsi` yaz.\n"
+        "Örnek: `M, L, XL` veya `43, 44, 45`",
+        parse_mode="Markdown"
+    )
     return SIZE
 
 async def get_size(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     context.user_data["size"] = update.message.text.strip()
-    await update.message.reply_text("4️⃣ Renk tercihin? (Örn: czarny veya 'hepsi')")
+    await update.message.reply_text(
+        "5️⃣ *Renk tercihlerin neler?*\n"
+        "Birden fazlaysa virgülle ayır veya `hepsi` yaz.\n"
+        "Örnek: `czarny, czerwony, granatowy`",
+        parse_mode="Markdown"
+    )
     return COLOR
 
 async def get_color(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     context.user_data["color"] = update.message.text.strip()
-    await update.message.reply_text("5️⃣ Maksimum bütçen kaç PLN? (Örn: 300)")
+    await update.message.reply_text(
+        "6️⃣ *Maksimum bütçen kaç PLN?*\n"
+        "Sadece sayı yaz (Örn: `350`)",
+        parse_mode="Markdown"
+    )
     return PRICE
 
 async def get_price(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -60,34 +92,45 @@ async def get_price(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     try:
         max_p = float(raw_val)
     except ValueError:
-        await update.message.reply_text("Lütfen sadece rakam girin (Örn: 250).")
+        await update.message.reply_text("Lütfen geçerli bir sayı girin (Örn: 300).")
         return PRICE
 
     user_id = update.effective_user.id
     kw = context.user_data["keyword"]
     br = context.user_data["brand"]
+    gen = context.user_data["gender"]
     sz = context.user_data["size"]
     cl = context.user_data["color"]
 
-    alert_id = create_alert(user_id, kw, br, sz, cl, max_p)
+    alert_id = create_alert(user_id, kw, br, gen, sz, cl, max_p)
 
-    await update.message.reply_text(
-        f"✅ *Alarm Kaydedildi (ID: #{alert_id})*\n"
-        f"Ürün: {kw} | Marka: {br} | Bütçe: {max_p} PLN\n"
-        "İlk arama başlatılıyor, bulunan indirimler birazdan listelenecek...",
-        parse_mode="Markdown"
+    summary = (
+        f"✅ *Çoklu Filtreli Alarm Kuruldu! (ID: #{alert_id})*\n\n"
+        f"🔍 *Ürün:* {kw}\n"
+        f"🏷️ *Markalar:* {br}\n"
+        f"🚻 *Cinsiyet:* {gen}\n"
+        f"📏 *Bedenler:* {sz}\n"
+        f"🎨 *Renkler:* {cl}\n"
+        f"💰 *Maks Fiyat:* {max_p} PLN\n\n"
+        "🚀 Tüm siteler taranıyor, eşleşen fırsatlar dökülecek..."
     )
+    await update.message.reply_text(summary, parse_mode="Markdown")
 
-    # Anlık ilk taramayı tetikle
-    query = f"{kw} {br if br.lower() != 'hepsi' else ''}".strip()
-    asyncio.create_task(run_scan_and_send(context.bot, alert_id, user_id, query, max_p))
-
+    # Arka planda taramayı başlat
+    asyncio.create_task(run_scan_and_send(context.bot, alert_id, user_id, kw, br, gen, sz, cl, max_p))
     return ConversationHandler.END
 
-async def run_scan_and_send(bot, alert_id: int, user_id: int, query: str, max_p: float):
-    products = await search_all_sites(query, max_p)
+async def run_scan_and_send(bot, alert_id: int, user_id: int, kw: str, br: str, gen: str, sz: str, cl: str, max_p: float):
+    # Çoklu filtreleri temiz listelere ayırıyoruz
+    brands_list = [b.strip() for b in br.split(",") if b.strip()] if br.lower() != "hepsi" else []
+    sizes_list = [s.strip() for s in sz.split(",") if s.strip()] if sz.lower() != "hepsi" else []
+    colors_list = [c.strip() for c in cl.split(",") if c.strip()] if cl.lower() != "hepsi" else []
+    gender_val = gen if gen.lower() != "hepsi" else ""
+
+    products = await search_all_sites_multi(kw, brands_list, gender_val, sizes_list, colors_list, max_p)
+
     if not products:
-        await bot.send_message(chat_id=user_id, text=f"🔍 '{query}' için henüz uygun fiyatlı ürün bulunamadı.")
+        await bot.send_message(chat_id=user_id, text=f"🔍 Kriterlerine uygun yeni ürün bulunamadı.")
         return
 
     conn = get_connection()
@@ -107,11 +150,11 @@ async def run_scan_and_send(bot, alert_id: int, user_id: int, query: str, max_p:
     conn.close()
 
     if not new_found:
-        await bot.send_message(chat_id=user_id, text=f"ℹ️ '{query}' için yeni bir indirim yok.")
+        await bot.send_message(chat_id=user_id, text="ℹ️ Kriterlere uygun ürünler zaten daha önce bildirilmişti.")
         return
 
-    await bot.send_message(chat_id=user_id, text=f"🔥 *'{query}' İçin {len(new_found)} Yeni Fırsat!*", parse_mode="Markdown")
-    for item in new_found[:5]:
+    await bot.send_message(chat_id=user_id, text=f"🔥 *{len(new_found)} Yeni Fırsat Yakalandı!*", parse_mode="Markdown")
+    for item in new_found[:8]:
         text = (
             f"🏷️ *{item['title']}*\n"
             f"🏪 Mağaza: {item['platform']}\n"
@@ -124,7 +167,7 @@ async def list_alerts(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT id, keyword, brand, max_price FROM alert_monitors WHERE user_id = ? AND is_active = 1", (user_id,))
+    cursor.execute("SELECT id, keyword, brand, gender, size, max_price FROM alert_monitors WHERE user_id = ? AND is_active = 1", (user_id,))
     rows = cursor.fetchall()
     conn.close()
 
@@ -134,19 +177,19 @@ async def list_alerts(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     msg = "📋 *Aktif Alarmların:*\n\n"
     for r in rows:
-        msg += f"🔹 [ID: {r['id']}] {r['keyword']} ({r['brand']}) - Maks: {r['max_price']} PLN\n"
+        msg += f"🔹 [ID: {r['id']}] {r['keyword']} | Marka: {r['brand']} | Cinsiyet: {r['gender']} | Beden: {r['size']} | Maks: {r['max_price']} PLN\n"
     msg += "\nSilmek için: `/sil <id>`"
     await update.message.reply_text(msg, parse_mode="Markdown")
 
 async def delete_alert(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     if not context.args:
-        await update.message.reply_text("Silmek istediğin ID'yi belirt: Örn: `/sil 1`", parse_mode="Markdown")
+        await update.message.reply_text("Silmek istediğin ID'yi yaz. Örn: `/sil 1`", parse_mode="Markdown")
         return
     try:
         a_id = int(context.args[0])
     except ValueError:
-        await update.message.reply_text("ID bir sayı olmalıdır.")
+        await update.message.reply_text("ID sadece sayı olmalıdır.")
         return
 
     conn = get_connection()
@@ -169,6 +212,7 @@ def main():
         states={
             KEYWORD: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_keyword)],
             BRAND: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_brand)],
+            GENDER: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_gender)],
             SIZE: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_size)],
             COLOR: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_color)],
             PRICE: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_price)],
@@ -181,7 +225,7 @@ def main():
     app.add_handler(CommandHandler("sil", delete_alert))
     app.add_handler(conv)
 
-    print("🤖 Bot çalışıyor. Telegram'dan mesaj atabilirsin.")
+    print("🤖 Çoklu filtreli bot dinlemede...")
     app.run_polling()
 
 if __name__ == "__main__":
