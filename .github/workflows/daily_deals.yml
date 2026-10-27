@@ -2,20 +2,23 @@ name: Gunluk Indirim Tarayici
 
 on:
   schedule:
-    # UTC saatine göre günde 2 kez (Polonya saatine göre 09:00 ve 19:00 civarı)
+    # UTC saatine göre günde 2 kez (Polonya saatine göre ~09:00 ve ~19:00)
     - cron: '0 7,17 * * *'
-  workflow_dispatch: # İstediğinde GitHub arayüzünden tek tuşla manuel çalıştırma butonu
+  workflow_dispatch: # GitHub web arayüzünden tek tuşla manuel tetikleme
 
 jobs:
   scrape_and_notify:
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write # Veritabanını güncelleyip repoya geri push edebilmek için zorunlu izin
 
     steps:
       - name: Repoyu Klonla
         uses: actions/checkout@v4
 
       - name: Python Kurulumu
-        uses: setup-python@v5
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
           cache: 'pip'
@@ -34,6 +37,6 @@ jobs:
         run: |
           git config --global user.name "DealBot Runner"
           git config --global user.email "bot@dealhunter.pl"
-          git add deals_bot.db
+          git add deals_bot.db || true
           git commit -m "Auto: Veritabanı güncellendi [skip ci]" || echo "Değişiklik yok"
           git push
