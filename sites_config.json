@@ -1,0 +1,299 @@
+{
+  "ceneo": {
+    "name": "Ceneo.pl",
+    "search_url": "https://www.ceneo.pl/;szukaj-{query}",
+    "item_selector": "div.cat-prod-row",
+    "title_selector": "strong.cat-prod-row__name",
+    "price_selector": "span.price",
+    "link_selector": "a.js_clickHash",
+    "base_url": "https://www.ceneo.pl"
+  },
+  "allegro": {
+    "name": "Allegro.pl",
+    "search_url": "https://allegro.pl/listing?string={query}",
+    "item_selector": "article[data-item='true']",
+    "title_selector": "h2",
+    "price_selector": "span[aria-label*='zł']",
+    "link_selector": "a[href*='/oferta/']",
+    "base_url": "https://allegro.pl"
+  },
+  "erli": {
+    "name": "Erli.pl",
+    "search_url": "https://erli.pl/szukaj?q={query}",
+    "item_selector": "div.product-card",
+    "title_selector": "a.product-card__title",
+    "price_selector": "div.product-card__price",
+    "link_selector": "a.product-card__title",
+    "base_url": "https://erli.pl"
+  },
+  "olx": {
+    "name": "OLX.pl",
+    "search_url": "https://www.olx.pl/d/oferty/q-{query}/",
+    "item_selector": "div[data-cy='l-card']",
+    "title_selector": "h6",
+    "price_selector": "p[data-testid='ad-price']",
+    "link_selector": "a.css-qo0cxu",
+    "base_url": "https://www.olx.pl"
+  },
+  "empik": {
+    "name": "Empik.com",
+    "search_url": "https://www.empik.com/szukaj/produkt?q={query}",
+    "item_selector": "div.search-content-element",
+    "title_selector": "strong.ta-product-title",
+    "price_selector": "div.ta-price",
+    "link_selector": "a.seoTitle",
+    "base_url": "https://www.empik.com"
+  },
+  "decathlon": {
+    "name": "Decathlon.pl",
+    "search_url": "https://www.decathlon.pl/search?Ntt={query}",
+    "item_selector": "div.vtmn-flex-col",
+    "title_selector": "h2",
+    "price_selector": "span.vtmn-price",
+    "link_selector": "a.vtmn-layout",
+    "base_url": "https://www.decathlon.pl"
+  },
+  "intersport": {
+    "name": "Intersport.pl",
+    "search_url": "https://www.intersport.pl/catalogsearch/result/?q={query}",
+    "item_selector": "div.product-item-info",
+    "title_selector": "a.product-item-link",
+    "price_selector": "span.price",
+    "link_selector": "a.product-item-link",
+    "base_url": "https://www.intersport.pl"
+  },
+  "sportano": {
+    "name": "Sportano.pl",
+    "search_url": "https://sportano.pl/search?query={query}",
+    "item_selector": "div.product-card",
+    "title_selector": "h3.product-card__title",
+    "price_selector": "span.product-card__price-value",
+    "link_selector": "a.product-card__link",
+    "base_url": "https://sportano.pl"
+  },
+  "8a": {
+    "name": "8a.pl",
+    "search_url": "https://8a.pl/catalogsearch/result/?q={query}",
+    "item_selector": "li.item.product.product-item",
+    "title_selector": "a.product-item-link",
+    "price_selector": "span.price",
+    "link_selector": "a.product-item-link",
+    "base_url": "https://8a.pl"
+  },
+  "skalnik": {
+    "name": "Skalnik.pl",
+    "search_url": "https://www.skalnik.pl/szukaj?q={query}",
+    "item_selector": "div.product-box",
+    "title_selector": "h2.product-name",
+    "price_selector": "span.price-value",
+    "link_selector": "a.product-link",
+    "base_url": "https://www.skalnik.pl"
+  },
+  "e-horyzont": {
+    "name": "E-Horyzont.pl",
+    "search_url": "https://www.e-horyzont.pl/search?q={query}",
+    "item_selector": "div.product-item-info",
+    "title_selector": "a.product-item-link",
+    "price_selector": "span.price",
+    "link_selector": "a.product-item-link",
+    "base_url": "https://www.e-horyzont.pl"
+  },
+  "eobuwie": {
+    "name": "eobuwie.pl",
+    "search_url": "https://www.eobuwie.com.pl/s?q={query}",
+    "item_selector": "div.products-list__item",
+    "title_selector": "span.product-card__name",
+    "price_selector": "span.product-card__price",
+    "link_selector": "a.product-card__link",
+    "base_url": "https://www.eobuwie.com.pl"
+  },
+  "sizeer": {
+    "name": "Sizeer.com",
+    "search_url": "https://sklep.sizeer.com/search?q={query}",
+    "item_selector": "div.b-itemList_item",
+    "title_selector": "a.b-itemList_title",
+    "price_selector": "p.b-itemList_price",
+    "link_selector": "a.b-itemList_title",
+    "base_url": "https://sklep.sizeer.com"
+  },
+  "snipes": {
+    "name": "Snipes.pl",
+    "search_url": "https://www.snipes.pl/search?q={query}",
+    "item_selector": "div.b-product-tile",
+    "title_selector": "a.b-product-tile-body-link",
+    "price_selector": "span.b-product-tile-price-item",
+    "link_selector": "a.b-product-tile-body-link",
+    "base_url": "https://www.snipes.pl"
+  },
+  "footlocker": {
+    "name": "Footlocker.pl",
+    "search_url": "https://www.footlocker.pl/pl/search?q={query}",
+    "item_selector": "div.ProductCard",
+    "title_selector": "span.ProductName",
+    "price_selector": "span.ProductPrice",
+    "link_selector": "a.ProductCard-link",
+    "base_url": "https://www.footlocker.pl"
+  },
+  "sklepbiegacza": {
+    "name": "SklepBiegacza.pl",
+    "search_url": "https://sklepbiegacza.pl/szukaj?text={query}",
+    "item_selector": "div.product-box",
+    "title_selector": "h3.product-name",
+    "price_selector": "span.price",
+    "link_selector": "a.product-link",
+    "base_url": "https://sklepbiegacza.pl"
+  },
+  "militaria": {
+    "name": "Militaria.pl",
+    "search_url": "https://www.militaria.pl/szukaj?q={query}",
+    "item_selector": "div.product-card",
+    "title_selector": "a.product-title",
+    "price_selector": "span.price",
+    "link_selector": "a.product-title",
+    "base_url": "https://www.militaria.pl"
+  },
+  "e-militaria": {
+    "name": "e-militaria.pl",
+    "search_url": "https://e-militaria.pl/szukaj?controller=search&s={query}",
+    "item_selector": "article.product-miniature",
+    "title_selector": "h2.product-title",
+    "price_selector": "span.price",
+    "link_selector": "a.thumbnail",
+    "base_url": "https://e-militaria.pl"
+  },
+  "specshop": {
+    "name": "Specshop.pl",
+    "search_url": "https://www.specshop.pl/search.php?text={query}",
+    "item_selector": "div.product_wrapper",
+    "title_selector": "a.product__name",
+    "price_selector": "span.price",
+    "link_selector": "a.product__name",
+    "base_url": "https://www.specshop.pl"
+  },
+  "modivo": {
+    "name": "Modivo.pl",
+    "search_url": "https://modivo.pl/s?q={query}",
+    "item_selector": "div.product-item",
+    "title_selector": "h2.product-item__name",
+    "price_selector": "div.product-item__price",
+    "link_selector": "a.product-item__link",
+    "base_url": "https://modivo.pl"
+  },
+  "answear": {
+    "name": "Answear.com",
+    "search_url": "https://answear.com/s/{query}",
+    "item_selector": "div.ProductItem__productCard",
+    "title_selector": "h3.ProductItem__productCardTitle",
+    "price_selector": "div.ProductItem__priceRegular",
+    "link_selector": "a.ProductItem__productCardLink",
+    "base_url": "https://answear.com"
+  },
+  "halfprice": {
+    "name": "HalfPrice.eu",
+    "search_url": "https://halfprice.eu/pl/szukaj?q={query}",
+    "item_selector": "div.product-box",
+    "title_selector": "span.product-name",
+    "price_selector": "span.price",
+    "link_selector": "a.product-click",
+    "base_url": "https://halfprice.eu"
+  },
+  "ccc": {
+    "name": "CCC.eu",
+    "search_url": "https://ccc.eu/pl/search?query={query}",
+    "item_selector": "div.product-card",
+    "title_selector": "h2.product-card__name",
+    "price_selector": "span.product-card__price",
+    "link_selector": "a.product-card__link",
+    "base_url": "https://ccc.eu"
+  },
+  "reserved": {
+    "name": "Reserved.com",
+    "search_url": "https://www.reserved.com/pl/pl/search?q={query}",
+    "item_selector": "article.category-item",
+    "title_selector": "h3.product-name",
+    "price_selector": "span.price",
+    "link_selector": "a.image-wrapper",
+    "base_url": "https://www.reserved.com"
+  },
+  "mediaexpert": {
+    "name": "MediaExpert.pl",
+    "search_url": "https://www.mediaexpert.pl/szukaj?query[menu_item]=&query[querystring]={query}",
+    "item_selector": "div.offer-box",
+    "title_selector": "h2.name",
+    "price_selector": "span.whole",
+    "link_selector": "a.spark-link",
+    "base_url": "https://www.mediaexpert.pl"
+  },
+  "rtveuroagd": {
+    "name": "Euro.com.pl",
+    "search_url": "https://www.euro.com.pl/search.bhtml?keyword={query}",
+    "item_selector": "div.product-box",
+    "title_selector": "h2.product-name",
+    "price_selector": "div.price-normal",
+    "link_selector": "a.product-name",
+    "base_url": "https://www.euro.com.pl"
+  },
+  "xkom": {
+    "name": "x-kom.pl",
+    "search_url": "https://www.x-kom.pl/szukaj?q={query}",
+    "item_selector": "div.sc-1s1z2ue-0",
+    "title_selector": "h3",
+    "price_selector": "span.sc-6n6wgo-0",
+    "link_selector": "a[href*='/p/']",
+    "base_url": "https://www.x-kom.pl"
+  },
+  "morele": {
+    "name": "Morele.net",
+    "search_url": "https://www.morele.net/wyszukiwarka/0/0/,,,,,,,,,,,,/1/?q={query}",
+    "item_selector": "div.cat-product-inside",
+    "title_selector": "a.cat-product-name",
+    "price_selector": "div.price-new",
+    "link_selector": "a.cat-product-name",
+    "base_url": "https://www.morele.net"
+  },
+  "komputronik": {
+    "name": "Komputronik.pl",
+    "search_url": "https://www.komputronik.pl/search/category/1?query={query}",
+    "item_selector": "div.product-tile",
+    "title_selector": "a.font-headline",
+    "price_selector": "span.text-3xl",
+    "link_selector": "a.font-headline",
+    "base_url": "https://www.komputronik.pl"
+  },
+  "castorama": {
+    "name": "Castorama.pl",
+    "search_url": "https://www.castorama.pl/search?term={query}",
+    "item_selector": "div.product-card",
+    "title_selector": "p.product-card__title",
+    "price_selector": "span.price__value",
+    "link_selector": "a.product-card__link",
+    "base_url": "https://www.castorama.pl"
+  },
+  "leroymerlin": {
+    "name": "LeroyMerlin.pl",
+    "search_url": "https://www.leroymerlin.pl/szukaj.html?q={query}",
+    "item_selector": "div.product-box",
+    "title_selector": "a.product-title",
+    "price_selector": "span.price-main",
+    "link_selector": "a.product-title",
+    "base_url": "https://www.leroymerlin.pl"
+  },
+  "taniaksiazka": {
+    "name": "TaniaKsiazka.pl",
+    "search_url": "https://www.taniaksiazka.pl/szukaj/q-{query}",
+    "item_selector": "li.product",
+    "title_selector": "a.product-title",
+    "price_selector": "span.price",
+    "link_selector": "a.product-title",
+    "base_url": "https://www.taniaksiazka.pl"
+  },
+  "swiatksiazki": {
+    "name": "SwiatKsiazki.pl",
+    "search_url": "https://www.swiatksiazki.pl/szukaj?q={query}",
+    "item_selector": "div.product-item-info",
+    "title_selector": "a.product-item-link",
+    "price_selector": "span.price",
+    "link_selector": "a.product-item-link",
+    "base_url": "https://www.swiatksiazki.pl"
+  }
+}
