@@ -1,0 +1,39 @@
+name: Gunluk Indirim Tarayici
+
+on:
+  schedule:
+    # UTC saatine göre günde 2 kez (Polonya saatine göre 09:00 ve 19:00 civarı)
+    - cron: '0 7,17 * * *'
+  workflow_dispatch: # İstediğinde GitHub arayüzünden tek tuşla manuel çalıştırma butonu
+
+jobs:
+  scrape_and_notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Repoyu Klonla
+        uses: actions/checkout@v4
+
+      - name: Python Kurulumu
+        uses: setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Kütüphaneleri Yukle
+        run: |
+          pip install httpx beautifulsoup4 python-telegram-bot
+
+      - name: Siteleri Tara ve Telegram'a Bildir
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: |
+          python main_engine.py
+
+      - name: Guncel Veritabanini Kaydet (Commit & Push)
+        run: |
+          git config --global user.name "DealBot Runner"
+          git config --global user.email "bot@dealhunter.pl"
+          git add deals_bot.db
+          git commit -m "Auto: Veritabanı güncellendi [skip ci]" || echo "Değişiklik yok"
+          git push
