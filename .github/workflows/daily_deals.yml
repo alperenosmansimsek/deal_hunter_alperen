@@ -2,16 +2,16 @@ name: Gunluk Indirim Tarayici
 
 on:
   schedule:
-    # UTC saatine göre günde 2 kez (Polonya saatine göre ~09:00 ve ~19:00)
+    # UTC saatine göre günde 2 kez (Polonya yerel saatine göre 09:00 ve 19:00)
     - cron: '0 7,17 * * *'
-  workflow_dispatch: # GitHub web arayüzünden tek tuşla manuel tetikleme
+  workflow_dispatch: # GitHub web arayüzünden manuel tetikleme butonu
 
 jobs:
   scrape_and_notify:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: write # Veritabanını güncelleyip repoya geri push edebilmek için zorunlu izin
+      contents: write # Veritabanını repoya geri push edebilmek için izin
 
     steps:
       - name: Repoyu Klonla
@@ -21,10 +21,10 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-          cache: 'pip'
 
       - name: Kütüphaneleri Yukle
         run: |
+          python -m pip install --upgrade pip
           pip install httpx beautifulsoup4 python-telegram-bot
 
       - name: Siteleri Tara ve Telegram'a Bildir
