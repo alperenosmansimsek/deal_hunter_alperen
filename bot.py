@@ -13,7 +13,6 @@ from telegram.ext import (
 )
 from database import init_db, get_connection
 
-# Gerçek BotFather Tokenın:
 BOT_TOKEN = "8855696578:AAGFnOBmCVVmOgh8Cu7fils9zMcT2fLDBV4"
 
 logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
@@ -77,16 +76,14 @@ async def get_price(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     cl = context.user_data.get("color", "")
     chat_id = update.effective_chat.id
 
-    # Telegram Konu (Forum Topic) Açma
     topic_name = f"{kw.capitalize()} | {br[:15]} | {max_p} PLN"
     thread_id = None
     try:
         forum_topic = await context.bot.create_forum_topic(chat_id=chat_id, name=topic_name)
         thread_id = forum_topic.message_thread_id
     except Exception as e:
-        logging.warning(f"Topic açılamadı (normal sohbet veya yetki yok): {e}")
+        logging.warning(f"Topic acilamadi: {e}")
 
-    # Veritabanına Kayıt
     try:
         conn = get_connection()
         cursor = conn.cursor()
@@ -99,7 +96,7 @@ async def get_price(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         conn.close()
     except Exception as e:
         alert_id = 1
-        logging.error(f"DB Kayıt Hatası: {e}")
+        logging.error(f"DB Kayit Hatasi: {e}")
 
     welcome_msg = (
         f"🎯 *Filtreleriniz Alındı! (Takip ID: #{alert_id})*\n\n"
@@ -109,8 +106,8 @@ async def get_price(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         f"📏 *Beden:* {sz}\n"
         f"🎨 *Renk:* {cl}\n"
         f"💰 *Maks Fiyat:* {max_p} PLN\n\n"
-        "⚡ Günde 2 kez siteler taranıp fırsatlar buraya aktarılacaktır.\n"
-        "Yeni bir ürün takibi başlatmak için dilediğiniz an tekrar `/yeni` yazabilirsiniz."
+        "⚡ Günde 2 kez otomatik tarama yapılarak indirimler doğrudan buraya iletilecektir.\n"
+        "Yeni bir arama odası açmak için dilediğiniz zaman tekrar `/yeni` yazabilirsiniz."
     )
 
     if thread_id:
@@ -118,7 +115,6 @@ async def get_price(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     else:
         await update.message.reply_text(welcome_msg, parse_mode="Markdown")
 
-    # Akış bitti, bot bir sonraki /yeni komutuna hazır
     return ConversationHandler.END
 
 async def list_alerts(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -171,4 +167,20 @@ def main():
             KEYWORD: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_keyword)],
             BRAND: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_brand)],
             GENDER: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_gender)],
-            SIZE:
+            SIZE: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_size)],
+            COLOR: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_color)],
+            PRICE: [MessageHandler(filters.TEXT & ~filters.COMMAND, get_price)],
+        },
+        fallbacks=[CommandHandler("iptal", cancel)],
+    )
+
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("alarmlarim", list_alerts))
+    app.add_handler(CommandHandler("sil", delete_alert))
+    app.add_handler(conv)
+
+    print("🤖 Bot sorunsuz çalışıyor...")
+    app.run_polling()
+
+if __name__ == "__main__":
+    main()
